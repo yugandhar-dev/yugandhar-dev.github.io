@@ -10,92 +10,111 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Chosen Palette: Earthy Wellness -->
-    <!-- Application Structure Plan: The SPA is designed with a goal-oriented, three-part structure accessible via a top navigation: 1) Nutrition Hub, 2) Interactive Grocery List, and 3) Meal Planner. This non-linear design was chosen over the report's sequential format to empower users to directly access the tools most relevant to their immediate needs. The Hub facilitates learning by interactively linking nutrients to health goals (Weight, Skin, Hair). The Grocery List transforms a static document into a dynamic tool with goal-based filtering. The Meal Planner provides actionable guidance with a visual "Plate Method" chart and sample meal ideas. This task-oriented architecture enhances usability by making the report's rich information explorable and immediately applicable. -->
+    <!-- Application Structure Plan: The SPA is designed with a goal-oriented, three-part structure accessible via a top navigation: 1) Nutrition Hub, 2) Interactive Grocery List, and 3) Meal Planner. This non-linear design was chosen over the report's sequential format to empower users to directly access the tools most relevant to their immediate needs. The Hub facilitates learning by interactively linking nutrients to health goals (Weight, Skin, Hair). The Grocery List transforms a static document into a dynamic tool with goal-based filtering. The Meal Planner provides actionable guidance with a visual "Plate Method" chart and a new detailed 7-day meal plan. This task-oriented architecture enhances usability by making the report's rich information explorable and immediately applicable. -->
     <!-- Visualization & Content Choices: 
         - Report Info: The core principles of nutrition for Weight, Skin, and Hair. Goal: Inform & Organize. Viz/Presentation: Interactive cards for each key nutrient in the "Nutrition Hub". Interaction: Users click a health goal (e.g., "Skin Glow"), and relevant nutrient cards are highlighted. Clicking a card reveals details. Justification: This is more engaging than static text and allows for layered information discovery. Method: HTML/CSS/JS.
         - Report Info: The comprehensive grocery list. Goal: Organize & Action. Viz/Presentation: A filterable grid of food items. Interaction: Checkbox filters for "Weight," "Skin," and "Hair" dynamically show/hide relevant foods. Justification: Turns a passive list into a personalized, actionable shopping tool. Method: HTML/CSS/JS with data attributes.
         - Report Info: The "Plate Method" for balanced meals. Goal: Inform & Visualize Proportions. Viz/Presentation: A doughnut chart. Interaction: Hovering over segments shows tooltips with food examples. Justification: A chart provides a more intuitive understanding of proportions than descriptive text. Library: Chart.js (Canvas).
-        - Report Info: Sample meal ideas. Goal: Provide Practical Examples. Viz/Presentation: A clean card layout. Interaction: Simple, clear presentation of meal options. Justification: Organizes examples for easy browsing. Method: HTML/CSS.
+        - Report Info: A detailed 7-day meal plan. Goal: Provide a structured, actionable eating plan. Viz/Presentation: A tabbed interface for days of the week with meal cards. Interaction: Users click day tabs to view different meal plans. Justification: Organizes a large amount of information in a digestible, user-friendly format. Method: HTML/CSS/JS.
     -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #FDFBF8;
-            color: #4A4A4A;
+            background-color: #F9F7F4;
+            color: #3f3f46;
         }
         .nav-link {
             transition: all 0.3s ease;
             border-bottom: 2px solid transparent;
         }
         .nav-link.active {
-            color: #8C6A5D;
-            border-bottom-color: #8C6A5D;
+            color: #785a4f;
+            border-bottom-color: #785a4f;
+            font-weight: 600;
         }
-        .nutrient-card, .food-card {
+        .nutrient-card, .food-card, .meal-plan-card {
             transition: all 0.3s ease;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -2px rgba(0, 0, 0, 0.03);
         }
-        .nutrient-card:hover, .food-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -4px rgba(0, 0, 0, 0.07);
+        .nutrient-card:hover, .food-card:hover, .meal-plan-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
         }
         .filter-btn {
             transition: all 0.2s ease-in-out;
         }
-        .filter-btn.active {
+        .filter-btn:hover {
             transform: scale(1.05);
         }
         .chart-container {
             position: relative;
             width: 100%;
-            max-width: 400px;
+            max-width: 380px;
             margin-left: auto;
             margin-right: auto;
-            height: 400px;
-            max-height: 40vh;
+            height: 380px;
+            max-height: 45vh;
         }
-        .hidden-section {
+        .hidden-section, .hidden-plan {
             display: none;
         }
         .highlight {
             outline: 2px solid #A88B80;
-            outline-offset: 2px;
-            box-shadow: 0 0 15px rgba(168, 139, 128, 0.3);
+            outline-offset: 3px;
+            box-shadow: 0 0 20px rgba(168, 139, 128, 0.3);
         }
         .tag {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 1.5rem;
-            height: 1.5rem;
+            width: 1.75rem;
+            height: 1.75rem;
             border-radius: 9999px;
             font-weight: 600;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: white;
+            border: 2px solid #F9F7F4;
         }
         .tag-w { background-color: #82A3A1; }
         .tag-s { background-color: #D4A373; }
         .tag-h { background-color: #A88B80; }
+        .day-tab {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        .day-tab.active {
+            color: #785a4f;
+            border-bottom-color: #785a4f;
+            font-weight: 600;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body class="antialiased">
 
-    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-10 shadow-sm">
+    <header class="bg-white/90 backdrop-blur-lg sticky top-0 z-20 shadow-sm border-b border-gray-200/80">
         <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex-shrink-0">
-                    <h1 class="text-xl font-bold text-[#8C6A5D]">Nourish & Thrive</h1>
+                    <h1 class="text-2xl font-bold text-[#785a4f]">Nourish & Thrive</h1>
                 </div>
                 <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-4">
-                        <a href="#" id="nav-hub" class="nav-link active px-3 py-2 rounded-md text-sm font-medium">Nutrition Hub</a>
-                        <a href="#" id="nav-list" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Grocery List</a>
-                        <a href="#" id="nav-planner" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Meal Planner</a>
+                    <div class="ml-10 flex items-baseline space-x-6">
+                        <a href="#" id="nav-hub" class="nav-link active px-2 py-2 text-sm font-medium">Nutrition Hub</a>
+                        <a href="#" id="nav-list" class="nav-link px-2 py-2 text-sm font-medium">Grocery List</a>
+                        <a href="#" id="nav-planner" class="nav-link px-2 py-2 text-sm font-medium">Meal Planner</a>
                     </div>
                 </div>
                 <div class="md:hidden">
-                    <select id="mobile-nav" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    <select id="mobile-nav" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                         <option value="hub" selected>Nutrition Hub</option>
                         <option value="list">Grocery List</option>
                         <option value="planner">Meal Planner</option>
@@ -108,66 +127,73 @@
     <main class="container mx-auto p-4 sm:p-6 lg:p-8">
 
         <!-- Section 1: Nutrition Hub -->
-        <section id="section-hub">
-            <div class="text-center mb-10">
-                <h2 class="text-3xl font-bold text-gray-800 tracking-tight sm:text-4xl">Your Guide to Inner Vitality</h2>
-                <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-600">Discover the powerful connection between nutrients and your health goals. Select a goal to see which nutrients are key, or click on a nutrient to learn more about its benefits and best food sources.</p>
+        <section id="section-hub" class="fade-in">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-800 tracking-tight sm:text-5xl">Your Guide to Inner Vitality</h2>
+                <p class="mt-4 max-w-3xl mx-auto text-lg text-gray-600">Discover the powerful connection between nutrients and your health goals. Select a goal to see which nutrients are key, or click on a nutrient to learn more about its benefits and best food sources.</p>
             </div>
 
-            <div class="flex justify-center items-center gap-4 mb-10 flex-wrap">
-                <span class="font-semibold mr-2">Filter by Goal:</span>
-                <button class="filter-btn px-4 py-2 rounded-full font-semibold text-white bg-[#82A3A1] hover:bg-[#6d8a88]" data-goal="W">Weight Management</button>
-                <button class="filter-btn px-4 py-2 rounded-full font-semibold text-white bg-[#D4A373] hover:bg-[#c19262]" data-goal="S">Skin Glow</button>
-                <button class="filter-btn px-4 py-2 rounded-full font-semibold text-white bg-[#A88B80] hover:bg-[#91766c]" data-goal="H">Hair Growth</button>
-                <button id="clear-filter" class="px-4 py-2 rounded-full font-semibold text-gray-600 bg-gray-200 hover:bg-gray-300">Clear</button>
+            <div class="flex justify-center items-center gap-3 sm:gap-4 mb-12 flex-wrap">
+                <span class="font-semibold mr-2 text-gray-700">Filter by Goal:</span>
+                <button class="filter-btn px-5 py-2.5 rounded-full font-semibold text-white bg-[#82A3A1] hover:bg-[#6d8a88] shadow-sm" data-goal="W">Weight Management</button>
+                <button class="filter-btn px-5 py-2.5 rounded-full font-semibold text-white bg-[#D4A373] hover:bg-[#c19262] shadow-sm" data-goal="S">Skin Glow</button>
+                <button class="filter-btn px-5 py-2.5 rounded-full font-semibold text-white bg-[#A88B80] hover:bg-[#91766c] shadow-sm" data-goal="H">Hair Growth</button>
+                <button id="clear-filter" class="px-5 py-2.5 rounded-full font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300">Clear</button>
             </div>
 
-            <div id="nutrients-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div id="nutrients-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             </div>
         </section>
 
         <!-- Section 2: Interactive Grocery List -->
         <section id="section-list" class="hidden-section">
-            <div class="text-center mb-10">
-                <h2 class="text-3xl font-bold text-gray-800 tracking-tight sm:text-4xl">Interactive Grocery List</h2>
-                <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-600">Build your shopping list based on your health goals. Use the filters to find foods that support weight management (W), skin glow (S), and hair growth (H).</p>
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-800 tracking-tight sm:text-5xl">Interactive Grocery List</h2>
+                <p class="mt-4 max-w-3xl mx-auto text-lg text-gray-600">Build your shopping list based on your health goals. Use the filters to find foods that support weight management (W), skin glow (S), and hair growth (H).</p>
             </div>
-            <div id="grocery-list-container"></div>
+            <div id="grocery-list-container" class="space-y-12"></div>
         </section>
 
         <!-- Section 3: Meal Planner -->
         <section id="section-planner" class="hidden-section">
-            <div class="text-center mb-10">
-                <h2 class="text-3xl font-bold text-gray-800 tracking-tight sm:text-4xl">Meal Planner & Ideas</h2>
-                <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-600">Use the "Plate Method" to build balanced meals effortlessly, and get inspired with our sample meal and snack ideas.</p>
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-800 tracking-tight sm:text-5xl">Meal Planner & Ideas</h2>
+                <p class="mt-4 max-w-3xl mx-auto text-lg text-gray-600">Use the "Plate Method" to build balanced meals, and explore the 7-day plan for inspiration.</p>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-                    <h3 class="text-2xl font-bold text-center text-gray-800 mb-4">The Anatomy of a Balanced Plate</h3>
-                    <p class="text-center text-gray-600 mb-4">This visual guide helps you create perfectly portioned meals without counting calories. Hover over a section to see examples.</p>
+            <div class="grid grid-cols-1 xl:grid-cols-5 gap-10">
+                <div class="xl:col-span-2 bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-gray-100 h-full">
+                    <h3 class="text-2xl font-bold text-center text-gray-800 mb-2">The Balanced Plate</h3>
+                    <p class="text-center text-gray-600 mb-6">A visual guide to create perfectly portioned meals. Hover over a section for examples.</p>
                     <div class="chart-container">
                         <canvas id="plateMethodChart"></canvas>
                     </div>
-                     <p class="text-center text-gray-600 mt-4 font-semibold">+ A serving of Healthy Fats <span class="font-normal">(e.g., avocado, olive oil, nuts)</span></p>
+                     <p class="text-center text-gray-600 mt-6 font-semibold">+ Healthy Fats <span class="font-normal">(avocado, olive oil, nuts)</span></p>
                 </div>
-                <div id="meal-ideas-container" class="space-y-8">
+                <div id="meal-plan-container" class="xl:col-span-3 bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-gray-100">
+                    <h3 class="text-3xl font-bold text-gray-800 mb-6">7-Day Balanced Meal Plan</h3>
+                    <div id="day-tabs-container" class="border-b border-gray-200 mb-6">
+                        <nav class="-mb-px flex space-x-4 sm:space-x-8 overflow-x-auto pb-1" aria-label="Tabs">
+                        </nav>
+                    </div>
+                    <div id="daily-plan-container">
+                    </div>
                 </div>
             </div>
         </section>
     </main>
     
     <!-- Modal for Nutrient Details -->
-    <div id="nutrient-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div class="p-6">
+    <div id="nutrient-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center p-4 z-50 fade-in">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="p-8">
                 <div class="flex justify-between items-start">
-                    <h3 id="modal-title" class="text-2xl font-bold text-gray-800"></h3>
-                    <button id="close-modal" class="text-gray-400 hover:text-gray-600">&times;</button>
+                    <h3 id="modal-title" class="text-3xl font-bold text-gray-800"></h3>
+                    <button id="close-modal" class="text-gray-500 hover:text-gray-800 text-3xl leading-none">&times;</button>
                 </div>
-                <p id="modal-role" class="mt-2 text-gray-600"></p>
-                <h4 class="mt-6 font-semibold text-gray-700">Top Food Sources:</h4>
-                <ul id="modal-sources" class="mt-2 list-disc list-inside text-gray-600 space-y-1"></ul>
+                <p id="modal-role" class="mt-4 text-lg text-gray-600"></p>
+                <h4 class="mt-8 font-semibold text-xl text-gray-700">Top Food Sources:</h4>
+                <ul id="modal-sources" class="mt-3 list-disc list-inside text-gray-600 space-y-2 text-base"></ul>
             </div>
         </div>
     </div>
@@ -191,50 +217,53 @@ document.addEventListener('DOMContentLoaded', function () {
             { name: "Antioxidants", role: "Neutralize free radicals from UV and environmental damage, preventing premature aging of the skin.", sources: ["Berries", "Dark Chocolate (70%+)", "Green Tea", "Tomatoes"], goals: ["S"] }
         ],
         grocery: {
-            "Produce Aisle": [
-                { name: "Spinach, Kale", goals: ["W", "S", "H"] },
-                { name: "Broccoli, Cauliflower", goals: ["W", "S", "H"] },
-                { name: "Bell Peppers, Carrots", goals: ["W", "S", "H"] },
-                { name: "Sweet Potatoes", goals: ["W", "S", "H"] },
-                { name: "Tomatoes", goals: ["W", "S"] },
-                { name: "Onions, Garlic", goals: ["W", "S", "H"] },
-                { name: "Berries", goals: ["W", "S"] },
-                { name: "Citrus Fruits", goals: ["W", "S", "H"] },
-                { name: "Avocados", goals: ["W", "S", "H"] }
-            ],
-            "Protein Section": [
-                { name: "Skinless Chicken Breast", goals: ["W", "H"] },
-                { name: "Salmon, Mackerel, Sardines", goals: ["W", "S", "H"] },
-                { name: "Lean Beef (in moderation)", goals: ["W", "H"] },
-                { name: "Whole Eggs", goals: ["W", "S", "H"] },
-                { name: "Plain Greek Yogurt", goals: ["W", "S", "H"] },
-                { name: "Lentils, Chickpeas, Beans", goals: ["W", "S", "H"] },
-                { name: "Tofu, Tempeh", goals: ["W", "H"] }
-            ],
-            "Pantry Aisles": [
-                { name: "Rolled Oats, Quinoa", goals: ["W", "H"] },
-                { name: "Brown Rice", goals: ["W"] },
-                { name: "Almonds, Walnuts", goals: ["W", "S", "H"] },
-                { name: "Chia & Flaxseeds", goals: ["W", "S", "H"] },
-                { name: "Pumpkin & Sunflower Seeds", goals: ["S", "H"] },
-                { name: "Extra Virgin Olive Oil", goals: ["W", "S"] },
-                { name: "Canned Tuna/Salmon", goals: ["W", "S", "H"] }
-            ]
+            "Produce Aisle": [{ name: "Spinach, Kale", goals: ["W", "S", "H"] }, { name: "Broccoli, Cauliflower", goals: ["W", "S", "H"] }, { name: "Bell Peppers, Carrots", goals: ["W", "S", "H"] }, { name: "Sweet Potatoes", goals: ["W", "S", "H"] }, { name: "Tomatoes", goals: ["W", "S"] }, { name: "Onions, Garlic", goals: ["W", "S", "H"] }, { name: "Berries", goals: ["W", "S"] }, { name: "Citrus Fruits", goals: ["W", "S", "H"] }, { name: "Avocados", goals: ["W", "S", "H"] }],
+            "Protein Section": [{ name: "Skinless Chicken Breast", goals: ["W", "H"] }, { name: "Salmon, Mackerel, Sardines", goals: ["W", "S", "H"] }, { name: "Lean Beef (in moderation)", goals: ["W", "H"] }, { name: "Whole Eggs", goals: ["W", "S", "H"] }, { name: "Plain Greek Yogurt", goals: ["W", "S", "H"] }, { name: "Lentils, Chickpeas, Beans", goals: ["W", "S", "H"] }, { name: "Tofu, Tempeh", goals: ["W", "H"] }],
+            "Pantry Aisles": [{ name: "Rolled Oats, Quinoa", goals: ["W", "H"] }, { name: "Brown Rice", goals: ["W"] }, { name: "Almonds, Walnuts", goals: ["W", "S", "H"] }, { name: "Chia & Flaxseeds", goals: ["W", "S", "H"] }, { name: "Pumpkin & Sunflower Seeds", goals: ["S", "H"] }, { name: "Extra Virgin Olive Oil", goals: ["W", "S"] }, { name: "Canned Tuna/Salmon", goals: ["W", "S", "H"] }]
         },
-        meals: {
-            "Breakfast": [
-                { name: "Fiber & Protein Oats", desc: "Rolled oats with blueberries, walnuts, and a sprinkle of cinnamon." },
-                { name: "High Protein Scramble", desc: "Two eggs scrambled with spinach and tomatoes, served with whole-wheat toast and avocado." }
-            ],
-            "Lunch": [
-                { name: "The Power Salad", desc: "Mixed greens with grilled chicken, chickpeas, bell peppers, cucumber, and a lemon-olive oil vinaigrette." }
-            ],
-            "Dinner": [
-                { name: "Skin-Health Superstar", desc: "Baked salmon with dill and lemon, served with roasted sweet potato wedges and steamed broccoli." }
-            ],
-            "Snacks": [
-                { name: "Simple & Satisfying", desc: "An apple with almond butter, Greek yogurt with raspberries, or a handful of almonds with an orange." }
-            ]
+        mealPlan: {
+            "Monday": {
+                breakfast: { name: "Protein Oats", desc: "Rolled oats with a scoop of protein powder, topped with blueberries and walnuts.", benefits: "Sustained energy, satiety" },
+                lunch: { name: "Chicken & Quinoa Salad", desc: "Grilled chicken breast, quinoa, mixed greens, cucumber, tomatoes, with a lemon-tahini dressing.", benefits: "High protein, fiber" },
+                dinner: { name: "Salmon & Sweet Potato", desc: "Baked salmon with roasted sweet potato wedges and steamed broccoli.", benefits: "Rich in Omega-3s, Vitamin A" },
+                snacks: { name: "Greek Yogurt", desc: "Plain Greek yogurt with a handful of berries.", benefits: "Protein, antioxidants" }
+            },
+            "Tuesday": {
+                breakfast: { name: "Avocado Toast with Eggs", desc: "Two slices of whole-wheat toast with mashed avocado and two poached eggs.", benefits: "Healthy fats, complete protein" },
+                lunch: { name: "Lentil Soup", desc: "Hearty lentil soup with carrots, celery, and spinach. Pair with a slice of whole-wheat bread.", benefits: "High fiber, plant-based iron" },
+                dinner: { name: "Lean Beef Stir-fry", desc: "Lean beef strips stir-fried with bell peppers, broccoli, and snap peas in a low-sodium soy sauce. Served with brown rice.", benefits: "Heme iron, zinc, Vitamin C" },
+                snacks: { name: "Apple & Almond Butter", desc: "An apple with a tablespoon of almond butter.", benefits: "Fiber, healthy fats" }
+            },
+            "Wednesday": {
+                breakfast: { name: "Green Smoothie", desc: "Spinach, banana, almond milk, chia seeds, and a scoop of protein powder blended together.", benefits: "Nutrient-dense, hydrating" },
+                lunch: { name: "Leftover Beef Stir-fry", desc: "Enjoy the leftovers from last night's dinner.", benefits: "Convenient, balanced" },
+                dinner: { name: "Tofu & Veggie Skewers", desc: "Cubed tofu, cherry tomatoes, zucchini, and onion grilled or baked on skewers. Served with quinoa.", benefits: "Plant-based protein, colorful" },
+                snacks: { name: "Handful of Walnuts", desc: "A small handful of walnuts.", benefits: "Omega-3s, Vitamin E" }
+            },
+            "Thursday": {
+                breakfast: { name: "Protein Oats", desc: "Rolled oats with a scoop of protein powder, topped with sliced banana and chia seeds.", benefits: "Sustained energy, satiety" },
+                lunch: { name: "Tuna Salad Lettuce Wraps", desc: "Canned tuna mixed with Greek yogurt, celery, and herbs, served in large lettuce leaves.", benefits: "Lean protein, low carb" },
+                dinner: { name: "Chicken & Veggie Bake", desc: "Chicken breast baked on a sheet pan with chopped broccoli, carrots, and bell peppers, tossed in olive oil and herbs.", benefits: "Simple, high protein" },
+                snacks: { name: "Orange & Almonds", desc: "A small orange and a handful of almonds.", benefits: "Vitamin C, healthy fats" }
+            },
+            "Friday": {
+                breakfast: { name: "Avocado Toast with Eggs", desc: "Two slices of whole-wheat toast with mashed avocado and two scrambled eggs.", benefits: "Healthy fats, complete protein" },
+                lunch: { name: "Leftover Chicken Bake", desc: "Enjoy the leftovers from last night's dinner.", benefits: "Convenient, balanced" },
+                dinner: { name: "Shrimp & Zucchini Noodles", desc: "Sautéed shrimp with garlic, cherry tomatoes, and spinach, tossed with zucchini noodles.", benefits: "Low calorie, high flavor" },
+                snacks: { name: "Greek Yogurt", desc: "Plain Greek yogurt with a drizzle of honey.", benefits: "Protein, probiotics" }
+            },
+            "Saturday": {
+                breakfast: { name: "Whole-wheat Pancakes", desc: "Two whole-wheat pancakes topped with fresh berries and a small amount of pure maple syrup.", benefits: "Fiber, weekend treat" },
+                lunch: { name: "Large 'Power' Salad", desc: "Mixed greens, chickpeas, grilled chicken, assorted raw veggies, and a light vinaigrette.", benefits: "High fiber, nutrient-rich" },
+                dinner: { name: "Homemade Turkey Burgers", desc: "Lean ground turkey burger on a whole-wheat bun with lettuce, tomato, onion, and a side salad.", benefits: "Lean protein, satisfying" },
+                snacks: { name: "Dark Chocolate", desc: "A square of 70%+ dark chocolate.", benefits: "Antioxidants, satisfying" }
+            },
+            "Sunday": {
+                breakfast: { name: "Veggie Omelette", desc: "Two-egg omelette filled with spinach, mushrooms, and bell peppers, with a side of fruit.", benefits: "High protein, vitamins" },
+                lunch: { name: "Leftover Turkey Burger", desc: "Enjoy the leftovers from last night's dinner.", benefits: "Convenient, balanced" },
+                dinner: { name: "Roast Chicken & Veggies", desc: "A portion of roast chicken with roasted carrots, Brussels sprouts, and a small baked potato.", benefits: "Classic comfort, balanced" },
+                snacks: { name: "Carrot Sticks & Hummus", desc: "Baby carrots with a couple of tablespoons of hummus.", benefits: "Fiber, plant protein" }
+            }
         }
     };
 
@@ -256,18 +285,15 @@ document.addEventListener('DOMContentLoaded', function () {
         nutrientsGrid.innerHTML = '';
         data.nutrients.forEach((nutrient, index) => {
             const card = document.createElement('div');
-            card.className = 'nutrient-card bg-white p-4 rounded-lg border border-gray-200 cursor-pointer';
+            card.className = 'nutrient-card bg-white p-5 rounded-xl border border-gray-200/80 cursor-pointer';
             card.dataset.goals = nutrient.goals.join(' ');
             card.dataset.index = index;
-
             const name = document.createElement('h3');
-            name.className = 'font-bold text-lg text-gray-800';
+            name.className = 'font-bold text-xl text-gray-800';
             name.textContent = nutrient.name;
-
             const tagsContainer = document.createElement('div');
-            tagsContainer.className = 'flex gap-2 mt-2';
+            tagsContainer.className = 'flex gap-2 mt-3';
             nutrient.goals.forEach(goal => tagsContainer.appendChild(createTag(goal)));
-
             card.appendChild(name);
             card.appendChild(tagsContainer);
             nutrientsGrid.appendChild(card);
@@ -312,12 +338,10 @@ document.addEventListener('DOMContentLoaded', function () {
             const goal = button.dataset.goal;
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
-            
             document.querySelectorAll('.nutrient-card').forEach(card => {
+                card.classList.remove('highlight');
                 if (card.dataset.goals.includes(goal)) {
                     card.classList.add('highlight');
-                } else {
-                    card.classList.remove('highlight');
                 }
             });
         });
@@ -333,59 +357,75 @@ document.addEventListener('DOMContentLoaded', function () {
         container.innerHTML = '';
         Object.keys(data.grocery).forEach(category => {
             const categoryWrapper = document.createElement('div');
-            categoryWrapper.className = 'mb-8';
-
             const categoryTitle = document.createElement('h3');
-            categoryTitle.className = 'text-2xl font-bold text-gray-700 border-b-2 border-[#D4A373] pb-2 mb-4';
+            categoryTitle.className = 'text-3xl font-bold text-gray-700 border-b-2 border-[#D4A373] pb-3 mb-6';
             categoryTitle.textContent = category;
             categoryWrapper.appendChild(categoryTitle);
-
             const grid = document.createElement('div');
-            grid.className = 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4';
-            
+            grid.className = 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5';
             data.grocery[category].forEach(item => {
                 const card = document.createElement('div');
-                card.className = 'food-card bg-white p-4 rounded-lg border border-gray-200 flex justify-between items-center';
-                
+                card.className = 'food-card bg-white p-4 rounded-lg border border-gray-200/80 flex justify-between items-center';
                 const name = document.createElement('span');
-                name.className = 'text-gray-700';
+                name.className = 'text-gray-700 font-medium';
                 name.textContent = item.name;
-
                 const tagsContainer = document.createElement('div');
-                tagsContainer.className = 'flex gap-1.5';
+                tagsContainer.className = 'flex -space-x-2';
                 item.goals.forEach(goal => tagsContainer.appendChild(createTag(goal)));
-
                 card.appendChild(name);
                 card.appendChild(tagsContainer);
                 grid.appendChild(card);
             });
-
             categoryWrapper.appendChild(grid);
             container.appendChild(categoryWrapper);
         });
     }
 
-    function renderMealPlanner() {
-        const container = document.getElementById('meal-ideas-container');
-        container.innerHTML = '';
-        Object.keys(data.meals).forEach(category => {
-            const categoryWrapper = document.createElement('div');
-            categoryWrapper.className = 'bg-white p-6 rounded-xl shadow-lg border border-gray-100';
+    function renderMealPlan() {
+        const tabsContainer = document.querySelector('#day-tabs-container nav');
+        const planContainer = document.getElementById('daily-plan-container');
+        tabsContainer.innerHTML = '';
+        planContainer.innerHTML = '';
 
-            const categoryTitle = document.createElement('h3');
-            categoryTitle.className = 'text-xl font-bold text-gray-800 mb-3';
-            categoryTitle.textContent = category;
-            categoryWrapper.appendChild(categoryTitle);
+        Object.keys(data.mealPlan).forEach((day, index) => {
+            const tab = document.createElement('a');
+            tab.href = '#';
+            tab.className = `day-tab py-3 px-2 text-base font-medium text-gray-500 hover:text-gray-800 whitespace-nowrap ${index === 0 ? 'active' : ''}`;
+            tab.textContent = day;
+            tab.dataset.day = day;
+            tabsContainer.appendChild(tab);
 
-            const list = document.createElement('ul');
-            list.className = 'space-y-3';
-            data.meals[category].forEach(meal => {
-                const item = document.createElement('li');
-                item.innerHTML = `<strong class="text-gray-700">${meal.name}:</strong> <span class="text-gray-600">${meal.desc}</span>`;
-                list.appendChild(item);
+            const dayPlan = document.createElement('div');
+            dayPlan.id = `plan-${day}`;
+            dayPlan.className = `space-y-5 ${index > 0 ? 'hidden-plan' : 'fade-in'}`;
+            
+            Object.keys(data.mealPlan[day]).forEach(mealType => {
+                const meal = data.mealPlan[day][mealType];
+                const mealCard = document.createElement('div');
+                mealCard.className = 'meal-plan-card p-5 rounded-xl bg-gray-50 border border-gray-200/80';
+                mealCard.innerHTML = `
+                    <h4 class="font-bold text-lg text-gray-800 capitalize">${mealType}</h4>
+                    <p class="text-gray-700 font-semibold mt-1">${meal.name}</p>
+                    <p class="text-gray-600 text-sm mt-1">${meal.desc}</p>
+                    <p class="text-sm mt-3 text-[#785a4f] font-medium">✨ ${meal.benefits}</p>
+                `;
+                dayPlan.appendChild(mealCard);
             });
-            categoryWrapper.appendChild(list);
-            container.appendChild(categoryWrapper);
+            planContainer.appendChild(dayPlan);
+        });
+
+        tabsContainer.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetTab = e.target.closest('.day-tab');
+            if (targetTab) {
+                const day = targetTab.dataset.day;
+                document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
+                targetTab.classList.add('active');
+                document.querySelectorAll('#daily-plan-container > div').forEach(p => p.classList.add('hidden-plan'));
+                const activePlan = document.getElementById(`plan-${day}`);
+                activePlan.classList.remove('hidden-plan');
+                activePlan.classList.add('fade-in');
+            }
         });
     }
 
@@ -399,9 +439,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     label: 'Plate Method',
                     data: [50, 25, 25],
                     backgroundColor: ['#82A3A1', '#A88B80', '#D4A373'],
-                    borderColor: '#FDFBF8',
-                    borderWidth: 4,
-                    hoverOffset: 8
+                    borderColor: '#ffffff',
+                    borderWidth: 5,
+                    hoverOffset: 12
                 }]
             },
             options: {
@@ -411,31 +451,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 plugins: {
                     legend: {
                         position: 'bottom',
-                        labels: {
-                            padding: 20,
-                            boxWidth: 15,
-                            font: {
-                                size: 14
-                            }
-                        }
+                        labels: { padding: 25, boxWidth: 18, font: { size: 14 } }
                     },
                     tooltip: {
                         callbacks: {
                             label: function(context) {
                                 let label = context.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed !== null) {
-                                    label += context.parsed + '%';
-                                }
+                                if (label) { label += ': '; }
+                                if (context.parsed !== null) { label += context.parsed + '%'; }
                                 return label;
                             }
                         },
                         bodyFont: { size: 14 },
                         titleFont: { size: 16 },
                         padding: 12,
-                        backgroundColor: 'rgba(0,0,0,0.7)',
+                        backgroundColor: 'rgba(0,0,0,0.75)',
                         cornerRadius: 8,
                     }
                 }
@@ -448,20 +478,21 @@ document.addEventListener('DOMContentLoaded', function () {
         list: document.getElementById('section-list'),
         planner: document.getElementById('section-planner')
     };
-
     const navLinks = {
         hub: document.getElementById('nav-hub'),
         list: document.getElementById('nav-list'),
         planner: document.getElementById('nav-planner')
     };
-    
     const mobileNav = document.getElementById('mobile-nav');
 
     function switchView(view) {
         Object.values(sections).forEach(section => section.classList.add('hidden-section'));
         Object.values(navLinks).forEach(link => link.classList.remove('active'));
         
-        sections[view].classList.remove('hidden-section');
+        const activeSection = sections[view];
+        activeSection.classList.remove('hidden-section');
+        activeSection.classList.add('fade-in');
+        
         navLinks[view].classList.add('active');
         mobileNav.value = view;
     }
@@ -473,7 +504,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     renderNutrients();
     renderGroceryList();
-    renderMealPlanner();
+    renderMealPlan();
     renderPlateChart();
 });
 </script>
